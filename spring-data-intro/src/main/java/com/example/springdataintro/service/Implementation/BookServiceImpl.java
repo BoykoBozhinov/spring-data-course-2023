@@ -68,6 +68,74 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<String> findAllBookTitlesByAgeRestriction(String ageRestriction) {
+        return bookRepository.findAllByAgeRestriction(AgeRestriction.valueOf(ageRestriction))
+                .stream().map(book -> String.format("%s", book.getTitle())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findAllGoldenEditionBookTitlesWithLessThanCopiesCount(String editionType, Integer copies) {
+        return bookRepository.findAllByEditionTypeAndCopiesLessThan(EditionType.valueOf(editionType), copies)
+                .stream().map(book -> String.format("%s", book.getTitle())).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findAllBooksPricesAndTitlesByPriceLessThanAndGreaterThan(Integer priceLessThan, Integer priceGreaterThan) {
+        return bookRepository.findAllByPriceLessThanOrPriceGreaterThan(BigDecimal.valueOf(priceLessThan),
+                BigDecimal.valueOf(priceGreaterThan)).stream().map(book -> String.format("%s - $%.2f", book.getTitle(), book.getPrice()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findAllBooksTitlesNotReleasedInYear(Integer year) {
+        return bookRepository.findAllByNotReleasedInYear(year)
+                .stream().map(book -> String.format("%s", book.getTitle()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findBookTitleEditionTypeAndPriceReleasedBeforeDate(Integer day, Integer month, Integer year) {
+        return bookRepository.findAllByReleaseDateBefore(LocalDate.of(day, month, year))
+                .stream().map(book -> String.format("%s %s %.2f", book.getTitle(), book.getEditionType(), book.getPrice()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findBookTitlesContainingGivenString(String title) {
+        return bookRepository.findAllByTitleContainsIgnoreCase(title)
+                .stream().map(book -> String.format("%s", book.getTitle()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> findBooksByAuthorsLastNameStartsWithString(String startsWith) {
+        return bookRepository.findBookTitlesByAuthorsLastNameStartingWithString(startsWith)
+                .stream().map(book -> String.format("%s", book.getTitle()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public int findBooksCountWithTitleLongerThanGivenNumber(Integer length) {
+        return bookRepository.findBooksByTitleLengthLongerThanGivenNumber(length);
+    }
+
+    @Override
+    public int findBooksByAuthor(String firstName, String lastName) {
+        return bookRepository.findBookCopiesByAuthor(firstName, lastName);
+    }
+
+    @Override
+    public List<String> findBookByTitle(String title) {
+        return bookRepository.findBookByTitle(title)
+                .stream().map(book -> String.format("%s %s %s %.2f",
+                        book.getTitle(),
+                        book.getEditionType(),
+                        book.getAgeRestriction(),
+                        book.getPrice()))
+                .collect(Collectors.toList());
+    }
+
     private Book createBookFromInfo(String[] bookInfo) {
         EditionType editionType = EditionType.values()[Integer.parseInt(bookInfo[0])];
         LocalDate releaseDate = LocalDate.parse(bookInfo[1], DateTimeFormatter.ofPattern("d/M/yyyy"));

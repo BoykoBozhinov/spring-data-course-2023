@@ -52,4 +52,11 @@ public class AuthorServiceImpl implements AuthorService {
                         author.getBooks().size()))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<String> getAllAuthorsFirstNameStartsWithGivenLetter(String letter) {
+        return authorRepository.findAllByFirstNameEndsWith(letter)
+                .stream().map(author -> String.format("%s %s", author.getFirstName(), author.getLastName()))
+                .collect(Collectors.toList());
+    }
 }
